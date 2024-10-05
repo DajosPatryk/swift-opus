@@ -11,10 +11,6 @@ Use [Swift Package Manager](https://swift.org/package-manager/) to add this to y
 
 This package neither vendors the original Opus source code or embeds precompiled libraries or binary frameworks. It embeds the current Opus C source as a [git submodule](Sources/Copus), which Swift Package Manager will automatically download as part of the build process. See [Package.swift](Package.swift) for details.
 
-## Usage
-
-TODO
-
 ## License
 
 See [LICENSE](LICENSE) for more information.
