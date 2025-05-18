@@ -40,6 +40,7 @@ extension Opus {
 // MARK: Public encode methods
 
 extension Opus.Encoder {
+    @_optimize(speed)
 	public func encode(_ input: AVAudioPCMBuffer, to output: inout Data) throws -> Int {
 		output.count = try output.withUnsafeMutableBytes {
 			try encode(input, to: $0)
@@ -47,17 +48,20 @@ extension Opus.Encoder {
 		return output.count
 	}
 
+    @_optimize(speed)
 	public func encode(_ input: AVAudioPCMBuffer, to output: inout [UInt8]) throws -> Int {
 		try output.withUnsafeMutableBufferPointer {
 			try encode(input, to: $0)
 		}
 	}
 
+    @_optimize(speed)
 	public func encode(_ input: AVAudioPCMBuffer, to output: UnsafeMutableRawBufferPointer) throws -> Int {
 		let output = UnsafeMutableBufferPointer(start: output.baseAddress!.bindMemory(to: UInt8.self, capacity: output.count), count: output.count)
 		return try encode(input, to: output)
 	}
 
+    @_optimize(speed)
 	public func encode(_ input: AVAudioPCMBuffer, to output: UnsafeMutableBufferPointer<UInt8>) throws -> Int {
 		guard input.format.sampleRate == format.sampleRate, input.format.channelCount == format.channelCount else {
 			throw Opus.Error.badArgument
@@ -78,6 +82,7 @@ extension Opus.Encoder {
 // MARK: private encode methods
 
 extension Opus.Encoder {
+    @_optimize(speed)
 	private func encode(_ input: UnsafeBufferPointer<Int16>, to output: UnsafeMutableBufferPointer<UInt8>) throws -> Int {
 		let encodedSize = opus_encode(
 			encoder,
@@ -92,6 +97,7 @@ extension Opus.Encoder {
 		return Int(encodedSize)
 	}
 
+    @_optimize(speed)
 	private func encode(_ input: UnsafeBufferPointer<Float32>, to output: UnsafeMutableBufferPointer<UInt8>) throws -> Int {
 		let encodedSize = opus_encode_float(
 			encoder,

@@ -38,6 +38,7 @@ extension Opus {
 // MARK: Public decode methods
 
 extension Opus.Decoder {
+    @_optimize(speed)
 	public func decode(_ input: Data) throws -> AVAudioPCMBuffer {
 		try input.withUnsafeBytes {
 			let input = $0.bindMemory(to: UInt8.self)
@@ -51,6 +52,7 @@ extension Opus.Decoder {
 		}
 	}
 
+    @_optimize(speed)
 	public func decode(_ input: UnsafeBufferPointer<UInt8>, to output: AVAudioPCMBuffer) throws {
 		let decodedCount: Int
 		switch output.format.commonFormat {
@@ -69,6 +71,7 @@ extension Opus.Decoder {
 		output.frameLength = AVAudioFrameCount(decodedCount)
 	}
 
+    @_optimize(speed)
     public func decodeToData(_ input: Data) throws -> Data {
         try input.withUnsafeBytes {
             let input = $0.bindMemory(to: UInt8.self)
@@ -88,7 +91,11 @@ extension Opus.Decoder {
             var decodedCount: Int = 0
             var data = Data(count: bytesCount)
             try data.withUnsafeMutableBytes {
-                let output = $0.bindMemory(to: Int16.self)
+                let output = $0.bindMemory(
+                    to: format.commonFormat == .pcmFormatInt16
+                        ? Int16.self
+                        : Float32.self
+                )
                 decodedCount = try decode(input, to: output)
             }
             if decodedCount < 0 {
@@ -105,6 +112,7 @@ extension Opus.Decoder {
 // MARK: Private decode methods
 
 extension Opus.Decoder {
+    @_optimize(speed)
 	private func decode(_ input: UnsafeBufferPointer<UInt8>, to output: UnsafeMutableBufferPointer<Int16>) throws -> Int {
 		let decodedCount = opus_decode(
 			decoder,
@@ -120,6 +128,7 @@ extension Opus.Decoder {
 		return Int(decodedCount)
 	}
 
+    @_optimize(speed)
 	private func decode(_ input: UnsafeBufferPointer<UInt8>, to output: UnsafeMutableBufferPointer<Float32>) throws -> Int {
 		let decodedCount = opus_decode_float(
 			decoder,
